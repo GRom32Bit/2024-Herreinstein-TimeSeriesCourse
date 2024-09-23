@@ -3,7 +3,7 @@ import pandas as pd
 import math
 import cv2
 import imutils
-from google.colab.patches import cv2_imshow
+#from google.colab.patches import cv2_imshow
 
 
 def _img_preprocess(img: np.ndarray) -> np.ndarray:

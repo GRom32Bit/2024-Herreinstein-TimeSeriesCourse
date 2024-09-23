@@ -2,7 +2,7 @@ import numpy as np
 
 from modules.metrics import *
 from modules.utils import z_normalize
-
+from typing_extensions import Self
 
 default_metrics_params = {'euclidean': {'normalize': True},
                          'dtw': {'normalize': True, 'r': 0.05}

@@ -5,16 +5,6 @@ from modules.utils import z_normalize
 
 
 class DistanceMatrix:
-    """
-    Distance matrix between time series 
-
-    Parameters
-    ----------
-    metric : distance metric between two time series
-    normalize : normalize or not time series
-                Options: {euclidean, dtw}
-    """
-
     def __init__(self, metric : str = 'euclidean', normalize : bool = False) -> None:
 
         self._metric : str = metric
@@ -25,49 +15,28 @@ class DistanceMatrix:
 
     @property
     def values(self) -> np.ndarray:
-        """Return distances between time series
-        
-        Returns
-        -------
-        _values: distance matrix values
-        """
-
         return self._values
 
 
     @property
     def shape(self) -> tuple[int, int]:
-        """ Return the dimensionality of distance matrix
-        
-        Returns
-        -------
-        shape: size of distance matrix
-        """
-
         return self._shape
 
 
     @property
     def distance_metric(self) -> str:
-        """Return the distance metric
-
-        Returns
-        -------
-            metric which is used to calculate distances between time series  
-        """
-
-        normalization_str = ""
+        DOP = ""
         if (self._normalize):
-            normalization_str = "normalized "
+            DOP = "normalized "
         else:
-            normalization_str = "non-normalized "
+            DOP = "non-normalized "
 
-        return normalization_str + self._metric + " distance" 
+        return DOP + self._metric + " distance"
 
 
     def _choose_distance(self):
         """ Choose distance function for calculation of matrix
-        
+
         Returns
         -------
         dict_func: function reference
@@ -82,7 +51,7 @@ class DistanceMatrix:
 
     def calculate(self, input_data: np.ndarray) -> None:
         """ Calculate distance matrix
-        
+
         Parameters
         ----------
         input_data: time series set
