@@ -9,6 +9,7 @@ import numpy as np
 import random
 from sktime.distances import euclidean_distance, dtw_distance, pairwise_distance
 from sklearn.metrics import silhouette_score
+
 import cv2
 import imutils
 import glob
@@ -123,16 +124,22 @@ HCdtw.plot_dendrogram(ts_set, DLabs, ts_hspace=5, title='Дендрограмм�
 print("Where dendrogram 2?")
 
 
-from sklearn.metrics import silhouette_score
-range_n_clusters = [2, 3, 4, 5]
-for n_clusters in range_n_clusters:
+n_clusters = list()
+for i in range(2,11):
+    n_clusters.append(i)
+for i in n_clusters:
+    HCeuc = TimeSeriesHierarchicalClustering(n_clusters=i, method='average')
+    ELabs = HCeuc.fit_predict(EDM)
+    HCdtw = TimeSeriesHierarchicalClustering(n_clusters=i, method='average')
+    DLabs = HCdtw.fit_predict(dtw_distance_matrix)
+
     silhouette_DTW = silhouette_score(ts_set, DLabs)
     silhouette_EU = silhouette_score(ts_set, ELabs)
-    print("For DTW\t n_clusters =", n_clusters, "the average silhouette_score is :", silhouette_DTW)
-    print("For EU\t n_clusters =", n_clusters, "the average silhouette_score is :", silhouette_EU)
-    print("------------------------------------------------------------------------------------")
-
-
+    print("For DTW\t n_clusters =", i, "the average silhouette_score is :", silhouette_DTW)
+    print("For EU\t n_clusters =", i, "the average silhouette_score is :", silhouette_EU)
+    print()
+    #Чем ближе к 1, тем больше пересечение силуэтов. Поэтому с существенным отрывом лучше эвклидова метрика. По-хорошему чем больше кластеров, тем хуже результаты.
+    #Эвклидово расстояние больше подходит для временных рядов, поскольку нужно абсолютное значение, а не относительное.
 
 
 #Задание 5. Готово.
