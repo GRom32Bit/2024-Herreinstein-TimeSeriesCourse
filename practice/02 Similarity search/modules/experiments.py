@@ -8,6 +8,8 @@ from modules.distance_profile import brute_force
 from modules.bestmatch import NaiveBestMatchFinder, UCR_DTW
 from modules.plots import mplot2d
 
+import webbrowser
+
 
 def _get_param_values(exp_params: dict, param: str) -> list:
     """
@@ -15,12 +17,12 @@ def _get_param_values(exp_params: dict, param: str) -> list:
     
     Parameters
     ----------
-    exp_params : experiment parameters
-    param : parameter name
+    exp_params: experiment parameters
+    param: parameter name
     
     Returns
     -------
-    param_values : experiment parameter values
+    param_values: experiment parameter values
     """
 
     if (param in exp_params['fixed'].keys()):
@@ -37,28 +39,37 @@ def _run_experiment_dist_profile(algorithm: str, data: dict, exp_params: dict, a
     
     Parameters
     ----------
-    algorithm : algorithm name
-    data : set of time series and queries
-    exp_params : experiment parameters
-    alg_params : algorithm parameters
+    algorithm: algorithm name
+    data: set of time series and queries
+    exp_params: experiment parameters
+    alg_params: algorithm parameters
     
     Returns
     -------
-    times : execution times of algorithm
+    times: execution times of algorithm
     """
     
     n_list = _get_param_values(exp_params, 'n')
     m_list = _get_param_values(exp_params, 'm')
-
+    #print("WHERE?",m_list)
     times = []
 
     for n in n_list:
         for m in m_list:
+            #print("WHO?",m)
             match algorithm:
                 case 'brute_force':
                     runtime_code = f"brute_force(data['ts']['{n}'], data['query']['{m}'])"
-                case 'mass3': 
-                    runtime_code = f"mts.mass3(data['ts']['{n}'], data['query']['{m}'], alg_params['segment_len'])"
+                case 'mass3':
+                    DOP=alg_params['segment_len']
+                    TD=str(type(DOP))
+                    #print("WHY?", DOP,TD)
+                    if "int" in TD:
+                        DOPK=DOP
+                    else:
+                        DOPK=DOP[DOP.index(m)]
+                    #print("HOW?",DOPK)
+                    runtime_code = f"mts.mass3(data['ts']['{n}'], data['query']['{m}'], DOPK)"
                 case 'mass' | 'mass2':
                     runtime_code = f"mts.{algorithm}(data['ts']['{n}'], data['query']['{m}'])"    
             try:
@@ -77,14 +88,14 @@ def _run_experiment_best_match(algorithm: str, data: dict, exp_params: dict, alg
     
     Parameters
     ----------
-    algorithm : algorithm name
-    data : set of time series and queries
-    exp_params : experiment parameters
-    alg_params : algorithm parameters
+    algorithm: algorithm name
+    data: set of time series and queries
+    exp_params: experiment parameters
+    alg_params: algorithm parameters
     
     Returns
     -------
-    times : execution times of algorithm
+    times: execution times of algorithm
     """
     
     n_list = _get_param_values(exp_params, 'n')
@@ -118,21 +129,7 @@ def _run_experiment_best_match(algorithm: str, data: dict, exp_params: dict, alg
 
 
 def run_experiment(algorithm: str, task: str, data: dict, exp_params: dict, alg_params: dict = None) -> np.ndarray:
-    """
-    Run an experiment to measure the execution time of an algorithm
-    
-    Parameters
-    ----------
-    algorithm : algorithm name
-    task : the task that the algorithm performs
-    data : set of time series and queries
-    exp_params : experiment parameters
-    alg_params : algorithm parameters
-    
-    Returns
-    -------
-    times : execution times of algorithm
-    """
+
     
     if (task == "distance_profile"):
         times = _run_experiment_dist_profile(algorithm, data, exp_params, alg_params)
@@ -150,9 +147,9 @@ def visualize_plot_times(times: np.ndarray, comparison_param: np.ndarray, exp_pa
     
     Parameters
     ----------
-    times : execution times of algorithms
-    comparison_param : name of comparison parameter
-    exp_params : experiment parameters
+    times: execution times of algorithms
+    comparison_param: name of comparison parameter
+    exp_params: experiment parameters
     """
 
     if ('n' in exp_params['varying'].keys()):
@@ -176,12 +173,12 @@ def calculate_speedup(base_algorithm_times: np.ndarray, improved_algorithms_time
     
     Parameters
     ----------
-    base_algorithm_times : execution times of the base algorithm
-    algorithms_times : execution times of algorithms for which speedup is calculated
+    base_algorithm_times: execution times of the base algorithm
+    algorithms_times: execution times of algorithms for which speedup is calculated
     
     Returns
     -------
-    speedup : speedup algorithms relative to the base algorithm
+    speedup: speedup algorithms relative to the base algorithm
     """
 
     speedup = base_algorithm_times/improved_algorithms_times
@@ -195,8 +192,8 @@ def visualize_table_speedup(speedup_data: np.ndarray, table_index: list, table_c
     
     Parameters
     ----------
-    data : input data of table
-    table_index : index of table
+    data: input data of table
+    table_index: index of table
     table_columns: names of table columns
     table_title: title of table
     """
@@ -222,7 +219,9 @@ def visualize_table_speedup(speedup_data: np.ndarray, table_index: list, table_c
                                 ('padding', '10px 0px 10px 0px')
                             ]
                     }
-                ])\
-                .set_caption(table_caption)
+                ]).set_caption(table_caption)
+    filename = 'foo.html'
+    with open(filename, 'w') as f:
+        style_df.to_html(f)
 
-    display(style_df)
+    webbrowser.open_new_tab(filename)

@@ -7,20 +7,6 @@ from modules.metrics import DTW_distance
 
 
 def apply_exclusion_zone(array: np.ndarray, idx: int, excl_zone: int) -> np.ndarray:
-    """
-    Apply an exclusion zone to an array (inplace)
-    
-    Parameters
-    ----------
-    array : the array to apply the exclusion zone to
-    idx : the index around which the window should be centered
-    excl_zone : size of the exclusion zone
-    
-    Returns
-    -------
-    array: the array which is applied the exclusion zone
-    """
-
     zone_start = max(0, idx - excl_zone)
     zone_stop = min(array.shape[-1], idx + excl_zone)
     array[zone_start : zone_stop + 1] = np.inf
@@ -28,23 +14,7 @@ def apply_exclusion_zone(array: np.ndarray, idx: int, excl_zone: int) -> np.ndar
     return array
 
 
-def topK_match(dist_profile: np.ndarray, excl_zone: int, topK: int = 3, max_distance: float = np.inf) -> dict:
-    """
-    Search the topK match subsequences based on distance profile
-    
-    Parameters
-    ----------
-    dist_profile : distances between query and subsequences of time series
-    excl_zone : size of the exclusion zone
-    topK : count of the best match subsequences
-    max_distance : maximum distance between query and a subsequence `S` for `S` to be considered a
-        match
-    
-    Returns
-    -------
-    topK_match_results: dictionary containing results of algorithm
-    """
-
+def topK_match(dist_profile: np.ndarray, excl_zone: int, topK: int, max_distance: float = np.inf) -> dict:
     topK_match_results = {
         'indices': [],
         'distances': []
@@ -109,10 +79,6 @@ class BestMatchFinder:
         return excl_zone
 
 
-    def perform(self):
-
-        raise NotImplementedError
-
 
 class NaiveBestMatchFinder(BestMatchFinder):
     """
@@ -125,38 +91,37 @@ class NaiveBestMatchFinder(BestMatchFinder):
         Constructor of class NaiveBestMatchFinder
         """
 
-
     def perform(self, ts_data: np.ndarray, query: np.ndarray) -> dict:
-        """
-        Search subsequences in a time series that most closely match the query using the naive algorithm
-        
-        Parameters
-        ----------
-        ts_data : time series
-        query : query, shorter than time series
-
-        Returns
-        -------
-        best_match: dictionary containing results of the naive algorithm
-        """
+        #print(len(ts_data),len(query))
 
         query = copy.deepcopy(query)
-        if (len(ts_data.shape) != 2): # time series set
+        if (len(ts_data.shape) != 2):  # time series set
             ts_data = sliding_window(ts_data, len(query))
 
         N, m = ts_data.shape
+        print("SIZES:",N,m)
         excl_zone = self._calculate_excl_zone(m)
 
-        dist_profile = np.ones((N,))*np.inf
+        dist_profile = np.ones((N,)) * np.inf
         bsf = np.inf
 
         bestmatch = {
-            'index' : [],
-            'distance' : []
+            'index': [],
+            'distance': []
         }
-        
-        # INSERT YOUR CODE
 
+        if self.is_normalize:
+            query = z_normalize(query)
+        for i in range(1, N - m + 1):
+            if self.is_normalize:
+                ts_data[i:m] = z_normalize(ts_data[i])
+            dist = DTW_distance(query, ts_data[i], self.r)
+            if dist < bsf:
+                dist_profile[i] = dist
+                bestmatch = topK_match(dist_profile, excl_zone, self.topK)
+                if np.max(bestmatch['distances']) == self.topK:
+                    bsf = np.max(DTW_distance(query, ts_data[i]), self.r)
+            #print("CURR:",bestmatch)
         return bestmatch
 
 
@@ -172,7 +137,7 @@ class UCR_DTW(BestMatchFinder):
     lb_KeoghCQ_num : number of subsequences that pruned by LB_KeoghCQ bounding
     """
 
-    def __init__(self, excl_zone_frac: float = 1, topK: int = 3, is_normalize: bool = True, r: float = 0.05):
+    def __init__(self, excl_zone_frac: float = 1, topK: int = 5, is_normalize: bool = True, r: float = 0.05):
         super().__init__(excl_zone_frac, topK, is_normalize, r)
         """ 
         Constructor of class UCR_DTW
@@ -245,11 +210,10 @@ class UCR_DTW(BestMatchFinder):
 
         return statistics
 
-
     def perform(self, ts_data: np.ndarray, query: np.ndarray) -> dict:
         """
-        Search subsequences in a time series that most closely match the query using UCR-DTW algorithm
-        
+        Search subsequences in a time series that most closely match the query using the naive algorithm
+
         Parameters
         ----------
         ts_data: time series
@@ -257,25 +221,34 @@ class UCR_DTW(BestMatchFinder):
 
         Returns
         -------
-        best_match: dictionary containing results of UCR-DTW algorithm
+        best_match: dictionary containing results of the naive algorithm
         """
 
         query = copy.deepcopy(query)
-        if (len(ts_data.shape) != 2): # time series set
+        if (len(ts_data.shape) != 2):  # time series set
             ts_data = sliding_window(ts_data, len(query))
 
         N, m = ts_data.shape
-
         excl_zone = self._calculate_excl_zone(m)
 
-        dist_profile = np.ones((N,))*np.inf
+        dist_profile = np.ones((N,)) * np.inf
         bsf = np.inf
-        
+
         bestmatch = {
-            'index' : [],
-            'distance' : []
+            'index': [],
+            'distance': []
         }
 
-        # INSERT YOUR CODE
+        if self.is_normalize:
+            query = z_normalize(query)
+        for i in range(1, N - m + 1):
+            if self.is_normalize:
+                ts_data[i:m] = z_normalize(ts_data[i])
+            dist = DTW_distance(query, ts_data[i], self.r)
+            if dist < bsf:
+                dist_profile[i] = dist
+                bestmatch = topK_match(dist_profile, excl_zone, self.topK)
+                if np.max(bestmatch['distances']) == self.topK:
+                    bsf = np.max(DTW_distance(query, ts_data[i]), self.r)
 
         return bestmatch
