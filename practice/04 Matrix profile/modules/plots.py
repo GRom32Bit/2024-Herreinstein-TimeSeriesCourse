@@ -32,28 +32,27 @@ def plot_ts(ts, title='Input Time Series'):
 
     fig.update_xaxes(showgrid=False,
                      title='Time',
-                     title_font=dict(size=22, color='black'),
+                     title_font=dict(size=18, color='black'),
                      linecolor='#000',
                      ticks="outside",
-                     tickfont=dict(size=18, color='black'),
-                     linewidth=2,
-                     tickwidth=2)
+                     tickfont=dict(size=14, color='black'),
+                     linewidth=1,
+                     tickwidth=1)
     fig.update_yaxes(showgrid=False,
                      title='Values',
-                     title_font=dict(size=22, color='black'),
+                     title_font=dict(size=18, color='black'),
                      linecolor='#000',
                      ticks="outside",
-                     tickfont=dict(size=18, color='black'),
+                     tickfont=dict(size=14, color='black'),
                      zeroline=False,
-                     linewidth=2,
-                     tickwidth=2)
+                     linewidth=1,
+                     tickwidth=1)
 
     fig.update_layout(title=title,
-                      title_font=dict(size=24, color='black'),
+                      title_font=dict(size=18, color='black'),
                       plot_bgcolor="rgba(0,0,0,0)",
                       paper_bgcolor='rgba(0,0,0,0)',
-                      legend=dict(font=dict(size=20, color='black'))
-                      )
+                      legend=dict(font=dict(size=18, color='black')),height=1000,width=1000)
 
     fig.show(renderer="colab")
 
@@ -117,28 +116,27 @@ def plot_motifs(mp, top_k_motifs):
         fig.add_trace(go.Scatter(x=np.arange(m), y=mp['data']['ts1'][right_motif_idx:right_motif_idx+m], line=dict(color=px.colors.qualitative.Plotly[color_i]), showlegend = False), row=row, col=col)
 
 
-    fig.update_annotations(font=dict(size=22, color='black'))
+    fig.update_annotations(font=dict(size=18, color='black'))
 
     fig.update_xaxes(showgrid=False,
-                     title_font=dict(size=22, color='black'),
+                     title_font=dict(size=18, color='black'),
                      linecolor='#000',
                      ticks='outside',
-                     tickfont=dict(size=18, color='black'),
-                     linewidth=2,
-                     tickwidth=2)
+                     tickfont=dict(size=14, color='black'),
+                     linewidth=1,
+                     tickwidth=1)
     fig.update_yaxes(showgrid=False,
-                     title_font=dict(size=22, color='black'),
+                     title_font=dict(size=18, color='black'),
                      linecolor='#000',
                      ticks='outside',
-                     tickfont=dict(size=18), color='black',
+                     tickfont=dict(size=14), color='black',
                      zeroline=False,
-                     linewidth=2,
-                     tickwidth=2)
+                     linewidth=1,
+                     tickwidth=1)
 
-    fig.update_layout(title_font=dict(size=24, color='black'),
+    fig.update_layout(title_font=dict(size=8, color='black'),
                       plot_bgcolor='rgba(0,0,0,0)',
-                      paper_bgcolor='rgba(0,0,0,0)', 
-                      height=1300)
+                      paper_bgcolor='rgba(0,0,0,0)', height=1000,width=1000)
 
     fig.show(renderer="colab")
 
@@ -181,24 +179,24 @@ def plot_discords(mp, top_k_discords):
     fig.update_layout(title_text="Top-k discords in time series")
 
     fig.update_xaxes(showgrid=False,
-                     title_font=dict(size=22, color='black'),
+                     title_font=dict(size=18, color='black'),
                      linecolor='#000',
                      ticks="outside",
-                     tickfont=dict(size=18, color='black'),
-                     linewidth=2,
-                     tickwidth=2)
+                     tickfont=dict(size=14, color='black'),
+                     linewidth=1,
+                     tickwidth=1)
     fig.update_yaxes(showgrid=False,
-                     title_font=dict(size=22, color='black'),
+                     title_font=dict(size=18, color='black'),
                      linecolor='#000',
                      ticks="outside",
-                     tickfont=dict(size=18), color='black',
+                     tickfont=dict(size=14), color='black',
                      zeroline=False,
-                     linewidth=2,
-                     tickwidth=2)
+                     linewidth=1,
+                     tickwidth=1)
 
-    fig.update_layout(title_font=dict(size=24, color='black'),
+    fig.update_layout(title_font=dict(size=18, color='black'),
                       plot_bgcolor="rgba(0,0,0,0)",
-                      paper_bgcolor='rgba(0,0,0,0)')
+                      paper_bgcolor='rgba(0,0,0,0)',height=1000,width=1000)
 
     fig.show(renderer="colab")
 
@@ -228,25 +226,25 @@ def plot_segmentation(mp, threshold):
 
     fig.add_hline(y=threshold, line_width=3, line_dash="dash", line_color="red", row=2, col=1)
 
-    fig.update_annotations(font=dict(size=22, color='black'))
+    fig.update_annotations(font=dict(size=18, color='black'))
     fig.update_xaxes(showgrid=False,
-                     title_font=dict(size=22, color='black'),
+                     title_font=dict(size=18, color='black'),
                      linecolor='#000',
                      ticks="outside",
-                     tickfont=dict(size=18, color='black'),
-                     linewidth=2,
-                     tickwidth=2)
+                     tickfont=dict(size=14, color='black'),
+                     linewidth=1,
+                     tickwidth=1)
     fig.update_yaxes(showgrid=False,
-                     title_font=dict(size=22, color='black'),
+                     title_font=dict(size=18, color='black'),
                      linecolor='#000',
                      ticks="outside",
-                     tickfont=dict(size=18), color='black',
+                     tickfont=dict(size=14), color='black',
                      zeroline=False,
-                     linewidth=2,
-                     tickwidth=2)
+                     linewidth=1,
+                     tickwidth=1)
 
-    fig.update_layout(title_font=dict(size=24, color='black'),
+    fig.update_layout(title_font=dict(size=18, color='black'),
                       plot_bgcolor="rgba(0,0,0,0)",
-                      paper_bgcolor='rgba(0,0,0,0)', height=700)
+                      paper_bgcolor='rgba(0,0,0,0)',height=1000,width=1000)
 
     fig.show(renderer="colab")
